@@ -1,9 +1,17 @@
 const socket = io();
 let user = ''
 
+const typingStopped = () => {
+  socket.emit('typing', {
+    message: 'Type Something!',
+    user: '',
+  })
+}
+
 $('form').submit(() => {
   socket.emit('chat message', $('#m').val());
   $('#m').val('');
+  typingStopped();
   return false;
 });
 
@@ -19,19 +27,14 @@ socket.on('users', (users) => {
 })
 
 $('#m').on('keyup', (e) => {
-    console.log(e.target.value.length);
     if (e.target.value.length > 0) {
       socket.emit('typing', {
         message: 'is typing...',
         user,
       });
     } else {
-      socket.emit('typing', {
-        message: 'Type Something!',
-        user: '',
-      })
+      typingStopped();
     }
-
 })
 
 socket.on('typing', (messageObj) => {
